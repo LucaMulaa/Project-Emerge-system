@@ -1,0 +1,23 @@
+[versions]
+collektive = "29.0.0"
+kotest = "6.2.7"
+kotlin = "2.4.21"
+mockito = "5.24.0"
+
+[libraries]
+collektive-dsl = { module = "it.unibo.collektive:collektive-dsl", version.ref = "collektive" }
+collektive-stdlib = { module = "it.unibo.collektive:collektive-stdlib", version.ref = "collektive" }
+kotest-junit5-jvm = { module = "io.kotest:kotest-runner-junit5-jvm", version.ref = "kotest" }
+kotest-assertions-core-jvm = { module = "io.kotest:kotest-assertions-core-jvm", version.ref = "kotest" }
+mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockito" }
+
+[bundles]
+collektive = [ "collektive-dsl", "collektive-stdlib" ]
+kotlin-testing = [ "kotest-junit5-jvm", "kotest-assertions-core-jvm", "mockito-core" ]
+
+[plugins]
+collektive = { id = "it.unibo.collektive.collektive-plugin", version.ref = "collektive" }
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-qa = "org.danilopianini.gradle-kotlin-qa:1.10.2"
+multiJvmTesting = "org.danilopianini.multi-jvm-test-plugin:4.5.11"
+taskTree = "com.dorongold.task-tree:4.0.2"
