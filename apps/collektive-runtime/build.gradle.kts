@@ -2,6 +2,7 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 plugins {
     alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.collektive)
     alias(libs.plugins.kotlin.qa)
     alias(libs.plugins.multiJvmTesting)
@@ -18,6 +19,9 @@ repositories {
 
 dependencies {
     implementation(libs.bundles.collektive)
+    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.mktt)
     testImplementation(libs.bundles.kotlin.testing)
 }
 
