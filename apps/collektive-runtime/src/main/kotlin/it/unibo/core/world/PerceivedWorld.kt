@@ -14,7 +14,7 @@ private val DEFAULT_POSE_TTL = 350.milliseconds
  *
  * @property x the position along the x axis, in metres
  * @property y the position along the y axis, in metres
- * @property heading the direction the robot faces, in radians (0 = along the x axis)
+ * @property heading the direction the robot faces, in radians (0 = along the y axis)
  */
 @Serializable
 data class RobotPose(
