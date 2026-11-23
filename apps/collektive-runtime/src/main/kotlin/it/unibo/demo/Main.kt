@@ -3,6 +3,8 @@ package it.unibo.demo
 import it.nicolasfarabegoli.mktt.MkttClient
 import it.unibo.core.aggregate.AggregateOrchestrator
 import it.unibo.core.aggregate.countRobots
+import it.unibo.core.world.PerceivedWorld
+import it.unibo.core.world.RobotPose
 import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -22,20 +24,29 @@ fun main() = runBlocking {
         port = BROKER_PORT
     }
     client.connect()
-    val neighbors = mutableMapOf<String, Set<String>>()
+    val json = Json { ignoreUnknownKeys = true }
+    val world = PerceivedWorld()
     launch {
         client.subscribe("/neighbors/+").collect { message ->
             val robotId = message.topic.split("/").last()
-            neighbors[robotId] = Json.decodeFromString<List<String>>(message.payloadAsString()).toSet()
+            world.updateNeighbors(robotId, Json.decodeFromString<List<String>>(message.payloadAsString()).toSet())
+        }
+    }
+    launch {
+        client.subscribe("/pose/+").collect { message ->
+            val robotId = message.topic.split("/").last()
+            runCatching { json.decodeFromString<RobotPose>(message.payloadAsString()) }
+                .onSuccess { pose -> world.updatePose(robotId, pose) }
+                .onFailure { println("Ignored a malformed pose from $robotId: ${it.message}") }
         }
     }
     val orchestrator = AggregateOrchestrator(
-        neighborsOf = { id -> neighbors[id].orEmpty() },
+        neighborsOf = world::neighborsOf,
         program = { countRobots(sink = localId == "000000") },
     )
     var round = 0
     while (true) {
-        val results = orchestrator.tick(neighbors.keys.toSet())
+        val results = orchestrator.tick(world.activeRobots())
         results.forEach { (id, value) ->
             val payload = """{"program":"counter","value":$value}"""
             client.publish("/aggregate/$id", payload.encodeToByteArray())
@@ -43,6 +54,7 @@ fun main() = runBlocking {
 
         if (round % ROUNDS_PER_LOG == 0) {
             println("round $round: $results")
+            println("  000000 is at ${world.poseOf("000000")}")
         }
         round++
         delay(ROUND_TIME)
