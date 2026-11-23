@@ -36,7 +36,7 @@ fun main() = runBlocking {
     var round = 0
     while (true) {
         val results = orchestrator.tick(neighbors.keys.toSet())
-        results.forEach{ (id,value)->
+        results.forEach { (id, value) ->
             val payload = """{"program":"counter","value":$value}"""
             client.publish("/aggregate/$id", payload.encodeToByteArray())
         }
