@@ -98,7 +98,13 @@ export const TelemetrySchema = z.object({
   }),
 });
 
+export const AggregateSchema = z.object({
+  program: z.string(),
+  value: finiteNumber,
+});
+
 export type Pose = z.infer<typeof PoseSchema>;
+export type Aggregate = z.infer<typeof AggregateSchema>;
 
 // heading_rad is the ArUco marker's yaw, not the robot's forward axis. Keep in sync with the
 // aggregate runtime's DRIVE_MARKER_YAW_OFFSET_DEG, which depends on how the sticker was glued.
@@ -119,9 +125,10 @@ export type InboundMessage =
   | { kind: "neighbors"; deviceId: string; payload: Neighbors }
   | { kind: "motor-config"; payload: MotorConfiguration }
   | { kind: "aruco-map"; payload: ArucoMap }
+  | { kind: "aggregate"; deviceId: string; payload: Aggregate }
   | { kind: "formation"; payload: FormationCommand };
 
-function parseDeviceTopic(topic: string, prefix: "/pose/" | "/telemetry/" | "/imu/" | "/neighbors/"): string | null {
+function parseDeviceTopic(topic: string, prefix: "/pose/" | "/telemetry/" | "/imu/" | "/neighbors/" | "/aggregate/",): string | null {
   if (!topic.startsWith(prefix)) {
     return null;
   }
@@ -155,6 +162,12 @@ export function parseInboundMqttMessage(topic: string, payload: unknown): Inboun
     return parsed.success
       ? { kind: "neighbors", deviceId: neighborsId, payload: parsed.data.filter((id) => id !== neighborsId) }
       : null;
+  }
+
+  const aggregateId = parseDeviceTopic(topic, "/aggregate/");
+  if (aggregateId) {
+    const parsed = AggregateSchema.safeParse(payload);
+    return parsed.success ? { kind: "aggregate", deviceId: aggregateId, payload: parsed.data } : null;
   }
 
   if (topic === "/config/motors") {

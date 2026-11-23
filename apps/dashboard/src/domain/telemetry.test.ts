@@ -52,6 +52,20 @@ describe("normalizzazione della telemetria firmware", () => {
     expect(parseInboundMqttMessage("/neighbors/invalid", ["A1B2C3"])).toBeNull();
   });
 
+  it("estrae il valore del programma aggregato dal topic", () => {
+    expect(parseInboundMqttMessage("/aggregate/000004", { program: "counter", value: 12 })).toEqual({
+      kind: "aggregate",
+      deviceId: "000004",
+      payload: { program: "counter", value: 12 },
+    });
+  });
+
+  it("rifiuta valori aggregati malformati", () => {
+    expect(parseInboundMqttMessage("/aggregate/000004", { program: "counter" })).toBeNull();
+    expect(parseInboundMqttMessage("/aggregate/000004", { program: "counter", value: "12" })).toBeNull();
+    expect(parseInboundMqttMessage("/aggregate/invalid", { program: "counter", value: 12 })).toBeNull();
+  });
+
   it("rifiuta ID e payload non validi", () => {
     expect(parseInboundMqttMessage("/pose/invalid", {})).toBeNull();
     expect(parseInboundMqttMessage("/telemetry/A1B2C3", { battery_telemetry: {} })).toBeNull();

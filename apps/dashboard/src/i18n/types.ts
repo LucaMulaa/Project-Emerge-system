@@ -55,6 +55,7 @@ export type TranslationDictionary = {
     stopped: string;
     motoring: (left: string, right: string) => string;
     battery: string;
+    counter: string;
     packVoltage: string;
     current: string;
     chargerTemp: string;

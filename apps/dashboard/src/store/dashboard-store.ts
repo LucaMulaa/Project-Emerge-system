@@ -3,6 +3,7 @@ import { subscribeWithSelector } from "zustand/middleware";
 import type { FormationCommand, GatewayMqttMessage, GatewayStatus } from "../../shared/protocol";
 import {
   parseInboundMqttMessage,
+  type Aggregate,
   type ImuTelemetry,
   type Pose,
   type MotorConfiguration,
@@ -14,6 +15,7 @@ export type RobotLiveState = {
   pose?: Pose;
   telemetry?: Telemetry;
   imu?: ImuTelemetry;
+  aggregate?: Aggregate;
   lastSeenAt: number;
   lastPoseAt?: number;
 };
@@ -110,6 +112,15 @@ export const useDashboardStore = create<DashboardState>()(
                 ...robot,
                 imu: inbound.payload,
                 lastSeenAt: message.receivedAt,
+              })),
+              lastProtocolError: null,
+            };
+          case "aggregate":
+            // Not a liveness signal: retained values outlive the robot, so lastSeenAt is left alone.
+            return {
+              ...robotWithUpdate(state, inbound.deviceId, (robot) => ({
+                ...robot,
+                aggregate: inbound.payload,
               })),
               lastProtocolError: null,
             };

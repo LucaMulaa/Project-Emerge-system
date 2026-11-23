@@ -97,6 +97,8 @@ function RobotTelemetry({ robot, now }: { robot: RobotLiveState; now: number }):
         <InfoRow label={t.sidebar.lastUpdate} value={lastUpdateLabel(robot.lastSeenAt, now, t)} yesLabel={t.sidebar.yes} noLabel={t.sidebar.no} />
         <InfoRow label={t.sidebar.motors} value={motorStatus} yesLabel={t.sidebar.yes} noLabel={t.sidebar.no} />
         <InfoRow label={t.sidebar.battery} value={robot.telemetry?.battery_telemetry.state_of_charge} unit="%" yesLabel={t.sidebar.yes} noLabel={t.sidebar.no} />
+        {/* String, not number: InfoRow formats numbers with 2 decimals and a count must read "12". */}
+        <InfoRow label={t.sidebar.counter} value={robot.aggregate ? String(robot.aggregate.value) : undefined} yesLabel={t.sidebar.yes} noLabel={t.sidebar.no} />
         <InfoRow label={t.sidebar.packVoltage} value={robot.telemetry?.battery_telemetry.voltage} unit="V" yesLabel={t.sidebar.yes} noLabel={t.sidebar.no} />
         <InfoRow label={t.sidebar.current} value={robot.telemetry?.battery_telemetry.current} unit="A" yesLabel={t.sidebar.yes} noLabel={t.sidebar.no} />
         <InfoRow label={t.sidebar.chargerTemp} value={robot.telemetry?.battery_telemetry.temperature} unit="°C" yesLabel={t.sidebar.yes} noLabel={t.sidebar.no} />

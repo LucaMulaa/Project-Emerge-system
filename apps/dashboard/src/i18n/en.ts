@@ -57,6 +57,7 @@ export const en: TranslationDictionary = {
     stopped: "Stopped",
     motoring: (left: string, right: string) => `L ${left} · R ${right}`,
     battery: "Battery",
+    counter: "Counter",
     packVoltage: "Pack voltage",
     current: "Current",
     chargerTemp: "Charger temperature",

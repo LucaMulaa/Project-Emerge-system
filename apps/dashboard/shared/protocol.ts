@@ -185,6 +185,7 @@ export const MQTT_SUBSCRIPTIONS = [
   "/telemetry/+",
   "/imu/+",
   "/neighbors/+",
+  "/aggregate/+",
   "/config/ota",
   "/config/motors",
   "/config/aruco-map",
