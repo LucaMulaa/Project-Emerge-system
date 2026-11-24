@@ -4,7 +4,7 @@ import it.nicolasfarabegoli.mktt.MkttClient
 import it.unibo.core.aggregate.AggregateOrchestrator
 import it.unibo.core.aggregate.countRobots
 import it.unibo.core.world.PerceivedWorld
-import it.unibo.core.world.RobotPose
+import it.unibo.core.world.followPoses
 import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -24,7 +24,6 @@ fun main() = runBlocking {
         port = BROKER_PORT
     }
     client.connect()
-    val json = Json { ignoreUnknownKeys = true }
     val world = PerceivedWorld()
     launch {
         client.subscribe("/neighbors/+").collect { message ->
@@ -32,14 +31,7 @@ fun main() = runBlocking {
             world.updateNeighbors(robotId, Json.decodeFromString<List<String>>(message.payloadAsString()).toSet())
         }
     }
-    launch {
-        client.subscribe("/pose/+").collect { message ->
-            val robotId = message.topic.split("/").last()
-            runCatching { json.decodeFromString<RobotPose>(message.payloadAsString()) }
-                .onSuccess { pose -> world.updatePose(robotId, pose) }
-                .onFailure { println("Ignored a malformed pose from $robotId: ${it.message}") }
-        }
-    }
+    followPoses(client, world)
     val orchestrator = AggregateOrchestrator(
         neighborsOf = world::neighborsOf,
         program = { countRobots(sink = localId == "000000") },
