@@ -2,7 +2,7 @@ package it.unibo.demo
 
 import it.nicolasfarabegoli.mktt.MkttClient
 import it.unibo.core.aggregate.AggregateOrchestrator
-import it.unibo.core.aggregate.countRobots
+import it.unibo.core.aggregate.countRobotsPerIsland
 import it.unibo.core.world.PerceivedWorld
 import it.unibo.core.world.followPoses
 import kotlin.time.Duration.Companion.milliseconds
@@ -34,7 +34,7 @@ fun main() = runBlocking {
     followPoses(client, world)
     val orchestrator = AggregateOrchestrator(
         neighborsOf = world::neighborsOf,
-        program = { countRobots(sink = localId == "000000") },
+        program = { countRobotsPerIsland() },
     )
     var round = 0
     while (true) {
