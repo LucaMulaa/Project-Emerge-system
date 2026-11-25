@@ -4,12 +4,11 @@ import it.nicolasfarabegoli.mktt.MkttClient
 import it.unibo.core.aggregate.AggregateOrchestrator
 import it.unibo.core.aggregate.countRobotsPerIsland
 import it.unibo.core.world.PerceivedWorld
+import it.unibo.core.world.followNeighbors
 import it.unibo.core.world.followPoses
 import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.serialization.json.Json
 
 private const val BROKER_PORT = 1883
 private const val ROUNDS_PER_LOG = 10
@@ -25,12 +24,7 @@ fun main() = runBlocking {
     }
     client.connect()
     val world = PerceivedWorld()
-    launch {
-        client.subscribe("/neighbors/+").collect { message ->
-            val robotId = message.topic.split("/").last()
-            world.updateNeighbors(robotId, Json.decodeFromString<List<String>>(message.payloadAsString()).toSet())
-        }
-    }
+    followNeighbors(client, world)
     followPoses(client, world)
     val orchestrator = AggregateOrchestrator(
         neighborsOf = world::neighborsOf,
