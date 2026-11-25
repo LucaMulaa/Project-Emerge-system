@@ -55,4 +55,17 @@ class PerceivedWorld(
 
     /** The neighbours of robot [id], as published on `/neighbors/<id>`. */
     fun neighborsOf(id: String): Set<String> = neighbors[id].orEmpty()
+
+    /**
+     * Takes a [WorldSnapshot] of the world as it is now: only the robots with a recent pose,
+     * and their neighbours among them. Older poses are dropped.
+     */
+    fun snapshot(): WorldSnapshot {
+        val active: Set<String> = activeRobots()
+        val currentPoses: Map<String, RobotPose> = poses.mapValues { (_, value) -> value.first }
+        val currentNeighbors: Map<String, Set<String>> = neighbors
+            .filterKeys { id -> id in active }
+            .mapValues { (_, ids) -> ids intersect active }
+        return WorldSnapshot(currentPoses, currentNeighbors)
+    }
 }
