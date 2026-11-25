@@ -583,3 +583,25 @@ code { color: var(--accent); }
     max-height: 60vh;
   }
 }
+
+.neighborhood-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.neighborhood-radius {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.neighborhood-radius input {
+  width: 110px;
+}
+
+.neighborhood-error {
+  color: var(--warning);
+}

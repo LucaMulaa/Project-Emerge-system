@@ -40,6 +40,14 @@ export const it: TranslationDictionary = {
         hasNeighborhood ? " · linee: vicinato" : ""
       }`,
   },
+  neighborhood: {
+    ariaLabel: "Vicinato",
+    full: "Tutti",
+    radius: "Raggio",
+    radiusAria: "Raggio del vicinato in metri",
+    loading: "Vicinato…",
+    unreachable: "Servizio del vicinato non raggiungibile",
+  },
   sidebar: {
     liveFleet: "Flotta live",
     robots: "Robot",

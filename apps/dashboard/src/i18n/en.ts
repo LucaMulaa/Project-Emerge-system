@@ -40,6 +40,14 @@ export const en: TranslationDictionary = {
         hasNeighborhood ? " · lines: neighborhood" : ""
       }`,
   },
+  neighborhood: {
+    ariaLabel: "Neighborhood",
+    full: "All",
+    radius: "Radius",
+    radiusAria: "Neighborhood radius in meters",
+    loading: "Neighborhood…",
+    unreachable: "Neighborhood service unreachable",
+  },
   sidebar: {
     liveFleet: "Live fleet",
     robots: "Robots",

@@ -6,6 +6,7 @@ import { ChatPanel } from "../components/ChatPanel";
 import { getFormationLabel } from "../../shared/formations";
 import { useLocale } from "../services/locale-context";
 import { useDashboardStore } from "../store/dashboard-store";
+import { NeighborhoodControl } from "../components/NeighborhoodControl";
 
 export function DashboardPage(): React.JSX.Element {
   const { t } = useLocale();
@@ -34,6 +35,7 @@ export function DashboardPage(): React.JSX.Element {
             <span>{t.dashboard.positionsAvailable(posedRobotIds.length)}</span>
           </div>
           <div className="toolbar-actions">
+            <NeighborhoodControl />
             <button
               type="button"
               className="secondary-button formation-trigger"

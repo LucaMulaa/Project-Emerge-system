@@ -38,6 +38,14 @@ export type TranslationDictionary = {
     robotsWithoutPose: (count: number) => string;
     sceneHint: (is3d: boolean, hasNeighborhood: boolean) => string;
   };
+  neighborhood: {
+    ariaLabel: string;
+    full: string;
+    radius: string;
+    radiusAria: string;
+    loading: string;
+    unreachable: string;
+  };
   sidebar: {
     liveFleet: string;
     robots: string;
