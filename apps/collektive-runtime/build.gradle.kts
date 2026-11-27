@@ -24,6 +24,7 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.mktt)
     testImplementation(libs.bundles.kotlin.testing)
+    testImplementation(libs.kotlinx.coroutines.test)
 }
 
 kotlin {

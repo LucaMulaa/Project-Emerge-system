@@ -3,11 +3,11 @@ package it.unibo.demo
 import it.nicolasfarabegoli.mktt.MkttClient
 import it.unibo.core.aggregate.AggregateOrchestrator
 import it.unibo.core.aggregate.countRobotsPerIsland
-import it.unibo.core.world.PerceivedWorld
-import it.unibo.core.world.followNeighbors
-import it.unibo.core.world.followPoses
+import it.unibo.core.loop.updateLoop
+import it.unibo.core.world.WorldSnapshot
+import it.unibo.mqtt.MqttAggregateActuator
+import it.unibo.mqtt.MqttEnvironmentProvider
 import kotlin.time.Duration.Companion.milliseconds
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 
 private const val BROKER_PORT = 1883
@@ -23,26 +23,25 @@ fun main() = runBlocking {
         port = BROKER_PORT
     }
     client.connect()
-    val world = PerceivedWorld()
-    followNeighbors(client, world)
-    followPoses(client, world)
+    val provider = MqttEnvironmentProvider(client)
+    provider.start(this)
+    var current = WorldSnapshot(emptyMap(), emptyMap())
     val orchestrator = AggregateOrchestrator(
-        neighborsOf = world::neighborsOf,
+        neighborsOf = { id -> current.neighborsOf(id) },
         program = { countRobotsPerIsland() },
     )
     var round = 0
-    while (true) {
-        val results = orchestrator.tick(world.activeRobots())
-        results.forEach { (id, value) ->
-            val payload = """{"program":"counter","value":$value}"""
-            client.publish("/aggregate/$id", payload.encodeToByteArray())
-        }
-
-        if (round % ROUNDS_PER_LOG == 0) {
-            println("round $round: $results")
-            println("  000000 is at ${world.poseOf("000000")}")
-        }
-        round++
-        delay(ROUND_TIME)
-    }
+    updateLoop(
+        period = ROUND_TIME,
+        provider = provider,
+        tick = { world ->
+            current = world
+            orchestrator.tick(world.robots)
+        },
+        actuator = MqttAggregateActuator(client, program = "counter"),
+        boundary = { world ->
+            if (round % ROUNDS_PER_LOG == 0) println("round $round: ${world.robots.size} robots")
+            round++
+        },
+    )
 }
